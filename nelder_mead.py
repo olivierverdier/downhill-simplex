@@ -63,7 +63,7 @@ def reduction(f, res, sigma):
     res = [(pt,f(pt)) for pt in reduced_points]
 
 def nelder_mead(f, points, 
-         no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
+         no_improve_thr=10e-6, no_improv_break=10, max_iter=1000,
         alpha = 1., gamma = 1., rho = 0.5, sigma = 0.5):
     '''
         @param f (function): function to optimize, must return a scalar score 
@@ -73,7 +73,6 @@ def nelder_mead(f, points,
         @no_improv_thr,  no_improv_break (float, int): break after no_improv_break iterations with 
             an improvement lower than no_improv_thr
         @max_iter (int): always break after this number of iterations.
-            Set it to 0 to loop indefinitely.
         @alpha, gamma, rho, sigma (floats): parameters of the algorithm 
             (see Wikipedia page for reference)
     '''
@@ -90,16 +89,10 @@ def nelder_mead(f, points,
     no_improv = 0
 
     # simplex iter
-    iters = 0
-    while 1:
+    for iters in range(max_iter):
         # order
         res.sort(key = lambda x: x[1])
         best = res[0][1]
-
-        # break after max_iter
-        if max_iter and iters >= max_iter:
-            return res[0]
-        iters += 1
 
         # break after no_improv_break iterations with no improvement
 
@@ -119,5 +112,7 @@ def nelder_mead(f, points,
         if not reflection(f, x0, res, alpha, gamma):
             if not contraction(f, x0, res, rho):
                 reduction(f, res, sigma)
+    else:
+        raise Exception("No convergence after {} iterations".format(iters))
 
 
