@@ -116,12 +116,8 @@ def nelder_mead(f, points,
         pts = np.array([tup[0] for tup in res[:-1]])
         x0 = centroid(pts)
 
-        if reflection(f, x0, res, alpha, gamma):
-            continue
-
-        if contraction(f, x0, res, rho):
-            continue
-
-        reduction(f, res, sigma)
+        if not reflection(f, x0, res, alpha, gamma):
+            if not contraction(f, x0, res, rho):
+                reduction(f, res, sigma)
 
 
