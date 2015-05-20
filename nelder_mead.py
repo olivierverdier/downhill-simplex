@@ -1,12 +1,23 @@
-import copy
 
 '''
     Pure Python/Numpy implementation of the Nelder-Mead algorithm.
     Reference: https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
 '''
 
-def nelder_mead(f, x_start, 
-        step=0.1, no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
+def generate_simplex(x0, step=0.1):
+    """
+    Create a simplex based at x0
+    """
+    yield x0.copy()
+    for i,_ in enumerate(x0):
+        x = x0.copy()
+        x[i] += step
+        yield x
+
+
+
+def nelder_mead(f, points, 
+         no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
         alpha = 1., gamma = 2., rho = -0.5, sigma = 0.5):
     '''
         @param f (function): function to optimize, must return a scalar score 
@@ -22,16 +33,15 @@ def nelder_mead(f, x_start,
     '''
 
     # init
-    dim = len(x_start)
-    prev_best = f(x_start)
-    no_improv = 0
-    res = [[x_start, prev_best]]
+    dim = len(points[0])
 
-    for i in range(dim):
-        x = copy.copy(x_start)
-        x[i] = x[i] + step
+    res = []
+    for i,x in enumerate(points):
         score = f(x)
-        res.append([x, score])
+        res.append((x,score))
+
+    prev_best = f(points[0])
+    no_improv = 0
 
     # simplex iter
     iters = 0
