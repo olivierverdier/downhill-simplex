@@ -22,4 +22,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(xs), d+1)
         npt.assert_allclose(xs[-1], np.array([0.,0,.1]))
 
+    def test_centroid(self):
+        d = 3
+        xs = np.array(list(generate_simplex(np.zeros(d), step=1.)))
+        x0 = centroid(xs)
+        npt.assert_allclose(x0, np.array([1./(d+1)]*d)) # centroid of the canonical simplex
 

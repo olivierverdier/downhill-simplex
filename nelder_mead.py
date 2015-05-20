@@ -16,7 +16,11 @@ def generate_simplex(x0, step=0.1):
         x[i] += step
         yield x
 
-
+def centroid(points):
+    """
+    Compute the centroid of a list points given as an array.
+    """
+    return np.mean(points, axis=0)
 
 def nelder_mead(f, points, 
          no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
@@ -68,11 +72,9 @@ def nelder_mead(f, points,
         if no_improv >= no_improv_break:
             return res[0]
 
-        # centroid
-        x0 = np.zeros(dim)
-        for tup in res[:-1]:
-            for i, c in enumerate(tup[0]):
-                x0[i] += c / (len(res)-1)
+        # centroid of the lowest face
+        pts = np.array([tup[0] for tup in res[:-1]])
+        x0 = centroid(pts)
 
         # reflection
         xr = x0 + alpha*(x0 - res[-1][0])
