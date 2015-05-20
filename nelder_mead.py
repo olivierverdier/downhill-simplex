@@ -16,6 +16,9 @@ def generate_simplex(x0, step=0.1):
         x[i] += step
         yield x
 
+def make_simplex(x0, step=0.1):
+    return np.array(list(generate_simplex(x0)))
+
 def centroid(points):
     """
     Compute the centroid of a list points given as an array.
