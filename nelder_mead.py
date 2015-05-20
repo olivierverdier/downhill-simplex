@@ -60,7 +60,11 @@ def contraction(f, x0, res, rho):
 def reduction(f, res, sigma):
     dirs = pts - pts[0]
     reduced_points = pts[0] + sigma*dirs
-    res = [(pt,f(pt)) for pt in reduced_points]
+    res = make_score(f, reduced_points)
+
+def make_score(f, points):
+    res = [(pt,f(pt)) for pt in points]
+    return res
 
 def nelder_mead(f, points, 
          no_improve_thr=10e-6, no_improv_break=10, max_iter=1000,
@@ -80,10 +84,7 @@ def nelder_mead(f, points,
     # init
     dim = len(points[0])
 
-    res = []
-    for i,x in enumerate(points):
-        score = f(x)
-        res.append((x,score))
+    res = make_score(f, points)
 
     prev_best = f(points[0])
     no_improv = 0
