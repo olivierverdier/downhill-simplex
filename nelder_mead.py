@@ -57,6 +57,10 @@ def contraction(f, x0, res, rho):
         res[-1] = (xc, cscore)
     return progress
 
+def reduction(f, res, sigma):
+    dirs = pts - pts[0]
+    reduced_points = pts[0] + sigma*dirs
+    res = [(pt,f(pt)) for pt in reduced_points]
 
 def nelder_mead(f, points, 
          no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
@@ -118,9 +122,6 @@ def nelder_mead(f, points,
         if contraction(f, x0, res, rho):
             continue
 
-        # reduction
-        dirs = pts - pts[0]
-        reduced_points = pts[0] + sigma*dirs
-        res = [(pt,f(pt)) for pt in reduced_points]
+        reduction(f, res, sigma)
 
 
