@@ -102,15 +102,3 @@ def nelder_mead(f, x_start,
         res = nres
 
 
-if __name__ == "__main__":
-    # test
-    import math
-    import numpy as np
-    def f(x):
-        return math.sin(x[0])*math.cos(x[1])*(1./(abs(x[2])+1))
-
-    print nelder_mead(f, np.array([0.,0.,0.]))
-            
-
-
-        
