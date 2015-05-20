@@ -17,7 +17,7 @@ def generate_simplex(x0, step=0.1):
         yield x
 
 def make_simplex(x0, step=0.1):
-    return np.array(list(generate_simplex(x0)))
+    return np.array(list(generate_simplex(x0, step)))
 
 def centroid(points):
     """

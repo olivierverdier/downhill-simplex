@@ -19,9 +19,9 @@ class Test(unittest.TestCase):
     def test_simplex(self):
         d = 3
         x0 = np.zeros(d)
-        xs = make_simplex(x0)
+        xs = make_simplex(x0, step=1.)
         self.assertEqual(len(xs), d+1)
-        npt.assert_allclose(xs[-1], np.array([0.,0,.1]))
+        npt.assert_allclose(xs[-1], np.array([0.,0,1.]))
 
     def test_centroid(self):
         d = 3
