@@ -76,9 +76,11 @@ def nelder_mead(f, points,
         pts = np.array([tup[0] for tup in res[:-1]])
         x0 = centroid(pts)
 
-        # reflection
+        # reflected point and score
         xr = x0 + alpha*(x0 - res[-1][0])
         rscore = f(xr)
+
+        # reflection
         if res[0][1] <= rscore < res[-2][1]:
             res[-1] = (xr, rscore)
             continue
