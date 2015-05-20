@@ -46,7 +46,6 @@ def nelder_mead(f, x_start,
         iters += 1
 
         # break after no_improv_break iterations with no improvement
-        print '...best so far:', best
 
         if best < prev_best - no_improve_thr:
             no_improv = 0
