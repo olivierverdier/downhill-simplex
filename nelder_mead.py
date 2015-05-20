@@ -4,6 +4,8 @@
     Reference: https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
 '''
 
+import numpy as np
+
 def generate_simplex(x0, step=0.1):
     """
     Create a simplex based at x0
@@ -67,7 +69,7 @@ def nelder_mead(f, points,
             return res[0]
 
         # centroid
-        x0 = [0.] * dim
+        x0 = np.zeros(dim)
         for tup in res[:-1]:
             for i, c in enumerate(tup[0]):
                 x0[i] += c / (len(res)-1)
@@ -76,8 +78,7 @@ def nelder_mead(f, points,
         xr = x0 + alpha*(x0 - res[-1][0])
         rscore = f(xr)
         if res[0][1] <= rscore < res[-2][1]:
-            del res[-1]
-            res.append([xr, rscore])
+            res[-1] = (xr, rscore)
             continue
 
         # expansion
@@ -85,20 +86,17 @@ def nelder_mead(f, points,
             xe = x0 + gamma*(x0 - res[-1][0])
             escore = f(xe)
             if escore < rscore:
-                del res[-1]
-                res.append([xe, escore])
+                res[-1] = (xe, escore)
                 continue
             else:
-                del res[-1]
-                res.append([xr, rscore])
+                res[-1] = (xr, rscore)
                 continue
 
         # contraction
         xc = x0 + rho*(x0 - res[-1][0])
         cscore = f(xc)
         if cscore < res[-1][1]:
-            del res[-1]
-            res.append([xc, cscore])
+            res[-1] = (xc, cscore)
             continue
 
         # reduction
