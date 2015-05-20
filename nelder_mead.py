@@ -25,6 +25,27 @@ def centroid(points):
     """
     return np.mean(points, axis=0)
 
+def reflection(f, x0, res, alpha, gamma):
+    """
+    Reflection step.
+    alpha: alpha = 1 is a standard reflection
+    gamma: the amount of the expansion; gamma=0 means no expansion
+    """
+    # reflected point and score
+    xr = x0 + alpha*(x0 - res[-1][0])
+    rscore = f(xr)
+
+    progress = rscore < res[-2][1]
+    if progress: # if this is a progress, we keep it
+        res[-1] = (xr, rscore)
+        # if it is the new best point, we try to expand
+        if rscore < res[0][1]:
+            xe = xr + gamma*(xr - x0)
+            escore = f(xe)
+            if escore < rscore:
+                res[-1] = (xe, escore)
+    return progress
+
 def nelder_mead(f, points, 
          no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
         alpha = 1., gamma = 1., rho = -0.5, sigma = 0.5):
@@ -79,31 +100,9 @@ def nelder_mead(f, points,
         pts = np.array([tup[0] for tup in res[:-1]])
         x0 = centroid(pts)
 
-        # reflected point and score
-        xr = x0 + alpha*(x0 - res[-1][0])
-        rscore = f(xr)
-
-        # if this is a progress, we keep it
-        if rscore < res[-2][1]:
-            res[-1] = (xr, rscore)
-            # if it is the new best point, we try to expand; gamma = 0 means no expansion
-            if rscore < res[0][1]:
-                xe = xr + gamma*(xr - x0)
-                escore = f(xe)
-                if escore < rscore:
-                    res[-1] = (xe, escore)
+        if reflection(f, x0, res, alpha, gamma):
             continue
 
-        # expansion
-        if rscore < res[0][1]:
-            xe = x0 + gamma*(x0 - res[-1][0])
-            escore = f(xe)
-            if escore < rscore:
-                res[-1] = (xe, escore)
-                continue
-            else:
-                res[-1] = (xr, rscore)
-                continue
 
         # contraction
         xc = x0 + rho*(x0 - res[-1][0])

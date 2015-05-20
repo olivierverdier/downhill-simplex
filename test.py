@@ -29,3 +29,13 @@ class Test(unittest.TestCase):
         x0 = centroid(xs)
         npt.assert_allclose(x0, np.array([1./(d+1)]*d)) # centroid of the canonical simplex
 
+    def test_reflection(self):
+        def f(x): return x[0]
+        pts = make_simplex(np.zeros(2), step=1.)
+        res = [(pt,f(pt)) for pt in pts]
+        res.sort(key = lambda x: x[1])
+        lpts = np.array([tup[0] for tup in res[:-1]])
+        x0 = centroid(lpts)
+        progress = reflection(f, x0, res, 1., 1.)
+        self.assert_(progress)
+        npt.assert_allclose(res[-1][0], np.array([-2., 1.5]))
