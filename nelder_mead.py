@@ -119,12 +119,8 @@ def nelder_mead(f, points,
             continue
 
         # reduction
-        x1 = res[0][0]
-        nres = []
-        for tup in res:
-            redx = x1 + sigma*(tup[0] - x1)
-            score = f(redx)
-            nres.append([redx, score])
-        res = nres
+        dirs = pts - pts[0]
+        reduced_points = pts[0] + sigma*dirs
+        res = [(pt,f(pt)) for pt in reduced_points]
 
 
