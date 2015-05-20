@@ -46,9 +46,21 @@ def reflection(f, x0, res, alpha, gamma):
                 res[-1] = (xe, escore)
     return progress
 
+def contraction(f, x0, res, rho):
+    """
+    rho: contraction parametre: should be between zero and one
+    """
+    xc = x0 + rho*(res[-1][0] - x0)
+    cscore = f(xc)
+    progress = cscore < res[-1][1]
+    if progress:
+        res[-1] = (xc, cscore)
+    return progress
+
+
 def nelder_mead(f, points, 
          no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
-        alpha = 1., gamma = 1., rho = -0.5, sigma = 0.5):
+        alpha = 1., gamma = 1., rho = 0.5, sigma = 0.5):
     '''
         @param f (function): function to optimize, must return a scalar score 
             and operate over a numpy array of the same dimensions as x_start
@@ -103,12 +115,7 @@ def nelder_mead(f, points,
         if reflection(f, x0, res, alpha, gamma):
             continue
 
-
-        # contraction
-        xc = x0 + rho*(x0 - res[-1][0])
-        cscore = f(xc)
-        if cscore < res[-1][1]:
-            res[-1] = (xc, cscore)
+        if contraction(f, x0, res, rho):
             continue
 
         # reduction
