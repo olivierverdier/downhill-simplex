@@ -27,7 +27,7 @@ def centroid(points):
 
 def nelder_mead(f, points, 
          no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
-        alpha = 1., gamma = 2., rho = -0.5, sigma = 0.5):
+        alpha = 1., gamma = 1., rho = -0.5, sigma = 0.5):
     '''
         @param f (function): function to optimize, must return a scalar score 
             and operate over a numpy array of the same dimensions as x_start
@@ -83,9 +83,15 @@ def nelder_mead(f, points,
         xr = x0 + alpha*(x0 - res[-1][0])
         rscore = f(xr)
 
-        # reflection
-        if res[0][1] <= rscore < res[-2][1]:
+        # if this is a progress, we keep it
+        if rscore < res[-2][1]:
             res[-1] = (xr, rscore)
+            # if it is the new best point, we try to expand; gamma = 0 means no expansion
+            if rscore < res[0][1]:
+                xe = xr + gamma*(xr - x0)
+                escore = f(xe)
+                if escore < rscore:
+                    res[-1] = (xe, escore)
             continue
 
         # expansion
