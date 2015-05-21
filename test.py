@@ -37,6 +37,7 @@ class Test(unittest.TestCase):
         N = NelderMead(f, pts)
         ## res = [(pt,f(pt)) for pt in pts]
         ## res.sort(key = lambda x: x[1])
+        N.res = N.make_score(N.points)
         N.sort()
         lpts = np.array([tup[0] for tup in N.res[:-1]])
         x0 = centroid(lpts)

@@ -48,15 +48,12 @@ class NelderMead(object):
         '''
         self.f = f
         self.points = points
-        self.initialize()
-
-    def initialize(self):
-        self.res = self.make_score(self.points)
-
-        self.prev_best = self.f(self.points[0])
-        self.no_improv = 0
 
     def run(self):
+        # initialize
+        self.prev_best = self.f(self.points[0])
+        self.no_improv = 0
+        self.res = self.make_score(self.points)
 
         # simplex iter
         for iters in range(self.max_iter):
