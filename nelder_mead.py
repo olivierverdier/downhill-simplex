@@ -57,7 +57,8 @@ class NelderMead(object):
 
         # simplex iter
         for iters in range(self.max_iter):
-            best = self.sort()
+            self.sort()
+            best = self.res[0][1]
 
             # break after no_improv_break iterations with no improvement
 
@@ -86,8 +87,6 @@ class NelderMead(object):
         Order the points according to their value.
         """
         self.res.sort(key = lambda x: x[1])
-        best = self.res[0][1]
-        return best
 
     def reflection(self, x0, refl, ext):
         """
