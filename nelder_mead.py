@@ -82,7 +82,6 @@ def nelder_mead(f, points,
     '''
 
     # init
-    dim = len(points[0])
 
     res = make_score(f, points)
 
