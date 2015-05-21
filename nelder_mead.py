@@ -29,10 +29,10 @@ def centroid(points):
 
 class NelderMead(object):
 
-    alpha = 1.
-    gamma = 1.
-    rho = 0.5
-    sigma = 0.5
+    refl = 1.
+    ext = 1.
+    cont = 0.5
+    red = 0.5
 
     # no_improv_break: break after no_improv_break iterations with an improvement lower than no_improv_thr
     no_improve_thr=10e-6
@@ -77,27 +77,29 @@ class NelderMead(object):
             pts = np.array([tup[0] for tup in self.res[:-1]])
             x0 = centroid(pts)
 
-            if not self.reflection(x0, self.alpha, self.gamma):
-                if not self.contraction(x0, self.rho):
-                    self.reduction(self.sigma)
+            if not self.reflection(x0, self.refl, self.ext):
+                if not self.contraction(x0, self.cont):
+                    self.reduction(self.red)
         else:
             raise Exception("No convergence after {} iterations".format(iters))
 
 
     def sort(self):
-            # order
-            self.res.sort(key = lambda x: x[1])
-            best = self.res[0][1]
-            return best
-
-    def reflection(self, x0, alpha, gamma):
         """
-        Reflection step.
-        alpha: alpha = 1 is a standard reflection
-        gamma: the amount of the expansion; gamma=0 means no expansion
+        Order the points according to their value.
+        """
+        self.res.sort(key = lambda x: x[1])
+        best = self.res[0][1]
+        return best
+
+    def reflection(self, x0, refl, ext):
+        """
+        Reflection-extension step.
+        refl: refl = 1 is a standard reflection
+        ext: the amount of the expansion; ext=0 means no expansion
         """
         # reflected point and score
-        xr = x0 + alpha*(x0 - self.res[-1][0])
+        xr = x0 + refl*(x0 - self.res[-1][0])
         rscore = self.f(xr)
 
         progress = rscore < self.res[-2][1]
@@ -105,26 +107,29 @@ class NelderMead(object):
             self.res[-1] = (xr, rscore)
             # if it is the new best point, we try to expand
             if rscore < self.res[0][1]:
-                xe = xr + gamma*(xr - x0)
+                xe = xr + ext*(xr - x0)
                 escore = self.f(xe)
                 if escore < rscore:
                     self.res[-1] = (xe, escore)
         return progress
 
-    def contraction(self, x0, rho):
+    def contraction(self, x0, cont):
         """
-        rho: contraction parametre: should be between zero and one
+        cont: contraction parametre: should be between zero and one
         """
-        xc = x0 + rho*(self.res[-1][0] - x0)
+        xc = x0 + cont*(self.res[-1][0] - x0)
         cscore = self.f(xc)
         progress = cscore < self.res[-1][1]
         if progress:
             self.res[-1] = (xc, cscore)
         return progress
 
-    def reduction(self, sigma):
+    def reduction(self, red):
+        """
+        red: reduction parametre: should be between zero and one
+        """
         dirs = pts - pts[0]
-        reduced_points = pts[0] + sigma*dirs
+        reduced_points = pts[0] + red*dirs
         self.res = self.make_score(self.f, reduced_points)
 
     def make_score(self, points):
