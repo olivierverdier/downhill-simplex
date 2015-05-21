@@ -13,8 +13,10 @@ def f(x):
 
 class Test(unittest.TestCase):
     def test(self):
-        res = nelder_mead(f, list(generate_simplex(np.array([0.,0.,0.]))))
-        npt.assert_allclose(res[0], np.array([ -1.58089710e+00,  -2.39020317e-03,   1.39669799e-06]))
+        N = NelderMead(f, list(generate_simplex(np.array([0.,0.,0.]))))
+        N.run()
+        res = N.res
+        npt.assert_allclose(res[0][0], np.array([ -1.58089710e+00,  -2.39020317e-03,   1.39669799e-06]))
 
     def test_simplex(self):
         d = 3
@@ -32,10 +34,12 @@ class Test(unittest.TestCase):
     def test_reflection(self):
         def f(x): return x[0]
         pts = make_simplex(np.zeros(2), step=1.)
-        res = [(pt,f(pt)) for pt in pts]
-        res.sort(key = lambda x: x[1])
-        lpts = np.array([tup[0] for tup in res[:-1]])
+        N = NelderMead(f, pts)
+        ## res = [(pt,f(pt)) for pt in pts]
+        ## res.sort(key = lambda x: x[1])
+        N.sort()
+        lpts = np.array([tup[0] for tup in N.res[:-1]])
         x0 = centroid(lpts)
-        progress = reflection(f, x0, res, 1., 1.)
+        progress = N.reflection(x0, 1., 1.)
         self.assert_(progress)
-        npt.assert_allclose(res[-1][0], np.array([-2., 1.5]))
+        npt.assert_allclose(N.res[-1][0], np.array([-2., 1.5]))
