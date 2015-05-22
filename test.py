@@ -14,9 +14,8 @@ def f(x):
 class Test(unittest.TestCase):
     def test(self):
         N = NelderMead(f, list(generate_simplex(np.array([0.,0.,0.]))))
-        N.run()
-        res = N.res
-        npt.assert_allclose(res[0][0], np.array([ -1.58089710e+00,  -2.39020317e-03,   1.39669799e-06]))
+        res = N.run()
+        npt.assert_allclose(res[0], np.array([ -1.58089710e+00,  -2.39020317e-03,   1.39669799e-06]))
 
     def test_simplex(self):
         d = 3
@@ -37,10 +36,10 @@ class Test(unittest.TestCase):
         N = NelderMead(f, pts)
         ## res = [(pt,f(pt)) for pt in pts]
         ## res.sort(key = lambda x: x[1])
-        N.res = N.make_score(N.points)
-        N.sort()
-        lpts = np.array([tup[0] for tup in N.res[:-1]])
+        res = N.make_score(N.points)
+        res = N.sort(res)
+        lpts = np.array([tup[0] for tup in res[:-1]])
         x0 = centroid(lpts)
-        progress = N.reflection(x0, 1., 1.)
-        self.assert_(progress)
-        npt.assert_allclose(N.res[-1][0], np.array([-2., 1.5]))
+        new_res = N.reflection(res, x0, 1., 1.)
+        self.assert_(new_res)
+        npt.assert_allclose(new_res[-1][0], np.array([-2., 1.5]))

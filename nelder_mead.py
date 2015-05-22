@@ -56,12 +56,12 @@ class NelderMead(object):
         # initialize
         self.prev_best = self.f(self.points[0])
         self.no_improv = 0
-        self.res = self.make_score(self.points)
+        res = self.make_score(self.points)
 
         # simplex iter
         for iters in range(self.max_iter):
-            self.sort()
-            best = self.res[0][1]
+            res = self.sort(res)
+            best = res[0][1]
 
             # break after no_improv_break iterations with no improvement
             if best < self.prev_best - self.no_improve_thr:
@@ -71,65 +71,77 @@ class NelderMead(object):
                 self.no_improv += 1
         
             if self.no_improv >= self.no_improv_break:
-                return self.res[0]
+                return res[0]
 
             # centroid of the lowest face
-            pts = np.array([tup[0] for tup in self.res[:-1]])
+            pts = np.array([tup[0] for tup in res[:-1]])
             x0 = centroid(pts)
 
             # Nelder–Mead algorithm
-            if not self.reflection(x0, self.refl, self.ext):
-                if not self.contraction(x0, self.cont):
-                    self.reduction(self.red)
+            new_res = self.reflection(res, x0, self.refl, self.ext)
+            if new_res is None:
+                new_res = self.contraction(res, x0, self.cont)
+                if new_res is None:
+                    new_res = self.reduction(res, self.red)
+
+            res = new_res
         else:
             raise Exception("No convergence after {} iterations".format(iters))
 
 
-    def sort(self):
+    def sort(self, res):
         """
         Order the points according to their value.
         """
-        self.res.sort(key = lambda x: x[1])
+        return sorted(res, key = lambda x: x[1])
 
-    def reflection(self, x0, refl, ext):
+    def reflection(self, res, x0, refl, ext):
         """
         Reflection-extension step.
         refl: refl = 1 is a standard reflection
         ext: the amount of the expansion; ext=0 means no expansion
         """
         # reflected point and score
-        xr = x0 + refl*(x0 - self.res[-1][0])
+        xr = x0 + refl*(x0 - res[-1][0])
         rscore = self.f(xr)
 
-        progress = rscore < self.res[-2][1]
+        res = res[:]
+
+        progress = rscore < res[-2][1]
         if progress: # if this is a progress, we keep it
-            self.res[-1] = (xr, rscore)
+            res[-1] = (xr, rscore)
             # if it is the new best point, we try to expand
-            if rscore < self.res[0][1]:
+            if rscore < res[0][1]:
                 xe = xr + ext*(xr - x0)
                 escore = self.f(xe)
                 if escore < rscore:
-                    self.res[-1] = (xe, escore)
-        return progress
+                    res[-1] = (xe, escore)
+            return res
+        return None
 
-    def contraction(self, x0, cont):
+    def contraction(self, res, x0, cont):
         """
         cont: contraction parametre: should be between zero and one
         """
-        xc = x0 + cont*(self.res[-1][0] - x0)
+        xc = x0 + cont*(res[-1][0] - x0)
         cscore = self.f(xc)
-        progress = cscore < self.res[-1][1]
-        if progress:
-            self.res[-1] = (xc, cscore)
-        return progress
 
-    def reduction(self, red):
+        res = res[:]
+
+        progress = cscore < res[-1][1]
+        if progress:
+            res[-1] = (xc, cscore)
+            return res
+        return None
+
+    def reduction(self, res, red):
         """
         red: reduction parametre: should be between zero and one
         """
         dirs = pts - pts[0]
         reduced_points = pts[0] + red*dirs
-        self.res = self.make_score(self.f, reduced_points)
+        res = self.make_score(reduced_points)
+        return res
 
     def make_score(self, points):
         res = [(pt, self.f(pt)) for pt in points]
