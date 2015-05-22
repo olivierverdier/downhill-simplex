@@ -37,9 +37,9 @@ class NelderMead(object):
     cont = 0.5
     red = 0.5
 
-    # no_improv_break: break after no_improv_break iterations with an improvement lower than no_improv_thr
+    # max_stagnations: break after max_stagnations iterations with an improvement lower than no_improv_thr
     no_improve_thr=10e-6
-    no_improv_break=10
+    max_stagnations=10
 
     max_iter=1000
     
@@ -67,7 +67,7 @@ class NelderMead(object):
     def run(self):
         # initialize
         self.prev_best = self.f(self.points[0])
-        self.no_improv = 0
+        self.stagnations = 0
         res = self.make_score(self.points)
 
         # simplex iter
@@ -75,14 +75,14 @@ class NelderMead(object):
             res = self.sort(res)
             best = res[0][1]
 
-            # break after no_improv_break iterations with no improvement
+            # break after max_stagnations iterations with no improvement
             if best < self.prev_best - self.no_improve_thr:
-                self.no_improv = 0
+                self.stagnations = 0
                 self.prev_best = best
             else:
-                self.no_improv += 1
+                self.stagnations += 1
         
-            if self.no_improv >= self.no_improv_break:
+            if self.stagnations >= self.max_stagnations:
                 return res[0]
 
             # Nelder–Mead algorithm
