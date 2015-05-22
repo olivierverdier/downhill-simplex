@@ -57,8 +57,12 @@ class NelderMead(object):
         pts = np.array([tup[0] for tup in res[:-1]])
         x0 = centroid(pts)
 
-        new_res = self.reflection(res, x0, self.refl, self.ext)
-        if new_res is None:
+        new_res = self.reflection(res, x0, self.refl)
+        if new_res is not None:
+            exp_res = self.expansion(new_res, x0, self.ext)
+            if exp_res is not None:
+                new_res = exp_res
+        else:
             new_res = self.contraction(res, x0, self.cont)
             if new_res is None:
                 new_res = self.reduction(self.red)
@@ -99,11 +103,10 @@ class NelderMead(object):
         """
         return sorted(res, key = lambda x: x[1])
 
-    def reflection(self, res, x0, refl, ext):
+    def reflection(self, res, x0, refl):
         """
         Reflection-extension step.
         refl: refl = 1 is a standard reflection
-        ext: the amount of the expansion; ext=0 means no expansion
         """
         # reflected point and score
         xr = x0 + refl*(x0 - res[-1][0])
@@ -114,13 +117,22 @@ class NelderMead(object):
         progress = rscore < new_res[-2][1]
         if progress: # if this is a progress, we keep it
             new_res[-1] = (xr, rscore)
-            # if it is the new best point, we try to expand
-            if rscore < new_res[0][1]:
-                xe = xr + ext*(xr - x0)
-                escore = self.f(xe)
-                if escore < rscore:
-                    new_res[-1] = (xe, escore)
             return new_res
+        return None
+
+    def expansion(self, res, x0, ext):
+        """
+        ext: the amount of the expansion; ext=0 means no expansion
+        """
+        xr, rscore = res[-1]
+        # if it is the new best point, we try to expand
+        if rscore < res[0][1]:
+            xe = xr + ext*(xr - x0)
+            escore = self.f(xe)
+            if escore < rscore:
+                new_res = res[:]
+                new_res[-1] = (xe, escore)
+                return new_res
         return None
 
     def contraction(self, res, x0, cont):
