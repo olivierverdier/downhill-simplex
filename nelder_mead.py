@@ -61,7 +61,7 @@ class NelderMead(object):
         if new_res is None:
             new_res = self.contraction(res, x0, self.cont)
             if new_res is None:
-                new_res = self.reduction(res, self.red)
+                new_res = self.reduction(self.red)
         return new_res
 
     def run(self):
@@ -109,18 +109,18 @@ class NelderMead(object):
         xr = x0 + refl*(x0 - res[-1][0])
         rscore = self.f(xr)
 
-        res = res[:]
+        new_res = res[:]
 
-        progress = rscore < res[-2][1]
+        progress = rscore < new_res[-2][1]
         if progress: # if this is a progress, we keep it
-            res[-1] = (xr, rscore)
+            new_res[-1] = (xr, rscore)
             # if it is the new best point, we try to expand
-            if rscore < res[0][1]:
+            if rscore < new_res[0][1]:
                 xe = xr + ext*(xr - x0)
                 escore = self.f(xe)
                 if escore < rscore:
-                    res[-1] = (xe, escore)
-            return res
+                    new_res[-1] = (xe, escore)
+            return new_res
         return None
 
     def contraction(self, res, x0, cont):
@@ -130,22 +130,22 @@ class NelderMead(object):
         xc = x0 + cont*(res[-1][0] - x0)
         cscore = self.f(xc)
 
-        res = res[:]
+        new_res = res[:]
 
-        progress = cscore < res[-1][1]
+        progress = cscore < new_res[-1][1]
         if progress:
-            res[-1] = (xc, cscore)
-            return res
+            new_res[-1] = (xc, cscore)
+            return new_res
         return None
 
-    def reduction(self, res, red):
+    def reduction(self, red):
         """
         red: reduction parametre: should be between zero and one
         """
         dirs = pts - pts[0]
         reduced_points = pts[0] + red*dirs
-        res = self.make_score(reduced_points)
-        return res
+        new_res = self.make_score(reduced_points)
+        return new_res
 
     def make_score(self, points):
         res = [(pt, self.f(pt)) for pt in points]
