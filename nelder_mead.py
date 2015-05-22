@@ -52,6 +52,18 @@ class NelderMead(object):
         self.f = f
         self.points = points
 
+    def step(self, res):
+        # centroid of the lowest face
+        pts = np.array([tup[0] for tup in res[:-1]])
+        x0 = centroid(pts)
+
+        new_res = self.reflection(res, x0, self.refl, self.ext)
+        if new_res is None:
+            new_res = self.contraction(res, x0, self.cont)
+            if new_res is None:
+                new_res = self.reduction(res, self.red)
+        return new_res
+
     def run(self):
         # initialize
         self.prev_best = self.f(self.points[0])
@@ -73,16 +85,8 @@ class NelderMead(object):
             if self.no_improv >= self.no_improv_break:
                 return res[0]
 
-            # centroid of the lowest face
-            pts = np.array([tup[0] for tup in res[:-1]])
-            x0 = centroid(pts)
-
             # Nelder–Mead algorithm
-            new_res = self.reflection(res, x0, self.refl, self.ext)
-            if new_res is None:
-                new_res = self.contraction(res, x0, self.cont)
-                if new_res is None:
-                    new_res = self.reduction(res, self.red)
+            new_res = self.step(res)
 
             res = new_res
         else:
