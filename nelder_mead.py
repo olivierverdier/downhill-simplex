@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: UTF-8
+from __future__ import division
 
 '''
     Pure Python/Numpy implementation of the Nelder-Mead algorithm.
@@ -61,7 +64,6 @@ class NelderMead(object):
             best = self.res[0][1]
 
             # break after no_improv_break iterations with no improvement
-
             if best < self.prev_best - self.no_improve_thr:
                 self.no_improv = 0
                 self.prev_best = best
@@ -75,6 +77,7 @@ class NelderMead(object):
             pts = np.array([tup[0] for tup in self.res[:-1]])
             x0 = centroid(pts)
 
+            # Nelder–Mead algorithm
             if not self.reflection(x0, self.refl, self.ext):
                 if not self.contraction(x0, self.cont):
                     self.reduction(self.red)
