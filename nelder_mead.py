@@ -137,7 +137,7 @@ class NelderMead(object):
 
     def contraction(self, res, x0, cont):
         """
-        cont: contraction parametre: should be between zero and one
+        cont: contraction parameter: should be between zero and one
         """
         xc = x0 + cont*(res[-1][0] - x0)
         cscore = self.f(xc)
@@ -152,7 +152,7 @@ class NelderMead(object):
 
     def reduction(self, res, red):
         """
-        red: reduction parametre: should be between zero and one
+        red: reduction parameter: should be between zero and one
         """
         pts = np.array([pts for (pts,_) in res])
         dirs = pts - pts[0]
