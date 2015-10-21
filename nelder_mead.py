@@ -65,7 +65,7 @@ class NelderMead(object):
         else:
             new_res = self.contraction(res, x0, self.cont)
             if new_res is None:
-                new_res = self.reduction(self.red)
+                new_res = self.reduction(res, self.red)
         return new_res
 
     def run(self):
@@ -150,10 +150,11 @@ class NelderMead(object):
             return new_res
         return None
 
-    def reduction(self, red):
+    def reduction(self, res, red):
         """
         red: reduction parametre: should be between zero and one
         """
+        pts = np.array([pts for (pts,_) in res])
         dirs = pts - pts[0]
         reduced_points = pts[0] + red*dirs
         new_res = self.make_score(reduced_points)

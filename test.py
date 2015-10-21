@@ -44,3 +44,14 @@ class Test(unittest.TestCase):
         self.assert_(new_res)
         exp_res = N.expansion(new_res, x0, 1.)
         npt.assert_allclose(exp_res[-1][0], np.array([-2., 1.5]))
+
+    def test_reduction(self):
+        pts = make_simplex(np.zeros(2), step=1.)
+        def f(x): return x[0]
+        N = NelderMead(f, pts)
+        res = N.make_score(N.points)
+        red = .5
+        new_res = N.reduction(res, red)
+        npt.assert_allclose(np.array([pts for (pts,_) in new_res]), red*pts)
+
+
