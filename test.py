@@ -4,7 +4,7 @@ from __future__ import division
 
 import unittest
 
-from nelder_mead import *
+from downhill_simplex import *
 import numpy as np
 import numpy.testing as npt
 
@@ -13,7 +13,7 @@ def f(x):
 
 class Test(unittest.TestCase):
     def test(self):
-        N = NelderMead(f, list(generate_simplex(np.array([0.,0.,0.]))))
+        N = DownhillSimplex(f, list(generate_simplex(np.array([0.,0.,0.]))))
         res = N.run()
         npt.assert_allclose(res[0], np.array([ -1.58089710e+00,  -2.39020317e-03,   1.39669799e-06]))
 
@@ -33,7 +33,7 @@ class Test(unittest.TestCase):
     def test_reflection(self):
         def f(x): return x[0]
         pts = make_simplex(np.zeros(2), step=1.)
-        N = NelderMead(f, pts)
+        N = DownhillSimplex(f, pts)
         ## res = [(pt,f(pt)) for pt in pts]
         ## res.sort(key = lambda x: x[1])
         res = N.make_score(N.points)
@@ -48,7 +48,7 @@ class Test(unittest.TestCase):
     def test_reduction(self):
         pts = make_simplex(np.zeros(2), step=1.)
         def f(x): return x[0]
-        N = NelderMead(f, pts)
+        N = DownhillSimplex(f, pts)
         res = N.make_score(N.points)
         red = .5
         new_res = N.reduction(res, red)

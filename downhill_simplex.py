@@ -3,7 +3,7 @@
 from __future__ import division
 
 '''
-    Pure Python/Numpy implementation of the Nelder-Mead algorithm.
+    Pure Python/Numpy implementation of the downhill simplex algorithm.
     Reference: https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
 '''
 
@@ -30,7 +30,7 @@ def centroid(points):
 
 
 
-class NelderMead(object):
+class DownhillSimplex(object):
 
     refl = 1.
     ext = 1.
@@ -89,7 +89,7 @@ class NelderMead(object):
             if self.stagnations >= self.max_stagnations:
                 return res[0]
 
-            # Nelder–Mead algorithm
+            # Downhill-Simplex algorithm
             new_res = self.step(res)
 
             res = new_res
